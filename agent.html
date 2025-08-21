@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Agent POC - Multi-Tool Reasoning</title>
+    
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Syntax Highlighting -->
+    <link href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github-dark.min.css" rel="stylesheet">
+    
+    <!-- Modern Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Theme Variables */
+        :root {
+            /* Dark Theme (Default) */
+            --primary-color: #22D3EE; /* neon cyan */
+            --secondary-color: #F43F5E; /* neon pink-red */
+            --success-color: #22D3EE; /* neon cyan */
+            --danger-color: #F43F5E; /* neon pink-red */
+            --warning-color: #22D3EE; /* neon cyan */
+            --dark-bg: #0F172A; /* navy black */
+            --darker-bg: #0B1426; /* darker navy */
+            --grey-bg: #1E293B; /* navy grey */
+            --light-grey: #334155; /* lighter navy grey */
+            --text-primary: #F1F5F9; /* cool off-white */
+            --text-secondary: #CBD5E1; /* muted off-white */
+            --border-radius: 1.2rem;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.8);
+        }
+
+        /* Light Theme */
+        [data-theme="light"] {
+            --primary-color: #14B8A6; /* teal */
+            --secondary-color: #FB7185; /* soft coral pink */
+            --success-color: #14B8A6; /* teal */
+            --danger-color: #EF4444; /* red */
+            --warning-color: #FB7185; /* soft coral pink */
+            --dark-bg: #FDFDFC; /* soft warm white */
+            --darker-bg: #F7F7F6; /* slightly darker white */
+            --grey-bg: #F1F1F0; /* warm light grey */
+            --light-grey: #E2E2E1; /* light grey */
+            --text-primary: #1B1B1B; /* deep charcoal */
+            --text-secondary: #525252; /* muted charcoal */
+            --shadow: 0 8px 32px 0 rgba(27, 27, 27, 0.12);
+        }
+
+        /* Cyberpunk Theme */
+        [data-theme="cyberpunk"] {
+            --primary-color: #00FFFF; /* electric blue */
+            --secondary-color: #FF00FF; /* hot pink */
+            --success-color: #39FF14; /* acid green */
+            --danger-color: #FF003C; /* laser red */
+            --warning-color: #FFD300; /* cyber yellow */
+            --dark-bg: #000000; /* black */
+            --darker-bg: #0D0D0D; /* deep charcoal */
+            --grey-bg: #1A1A1A; /* charcoal gray */
+            --light-grey: #2A2A2A; /* lighter charcoal */
+            --text-primary: #00FFFF; /* electric blue */
+            --text-secondary: #9D00FF; /* neon purple */
+            --shadow: 0 8px 32px 0 rgba(0, 255, 255, 0.3);
+        }
+
+        /* Glassmorphism Theme */
+        [data-theme="glassmorphism"] {
+            --primary-color: #6366F1; /* indigo */
+            --secondary-color: #EC4899; /* pink */
+            --success-color: #6366F1; /* indigo */
+            --danger-color: #EF4444; /* red */
+            --warning-color: #F59E0B; /* amber */
+            --dark-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* gradient bg */
+            --darker-bg: rgba(255, 255, 255, 0.1); /* glass effect */
+            --grey-bg: rgba(255, 255, 255, 0.2); /* glass effect */
+            --light-grey: rgba(255, 255, 255, 0.3); /* glass effect */
+            --text-primary: #FFFFFF; /* white */
+            --text-secondary: #E5E7EB; /* light grey */
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--grey-bg) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        /* Glassmorphism specific background */
+        [data-theme="glassmorphism"] body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Cyberpunk specific effects */
+        [data-theme="cyberpunk"] {
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        [data-theme="cyberpunk"] .agent-title {
+            text-shadow: 0 0 20px #00FFFF, 0 0 40px #00FFFF, 0 0 60px #00FFFF;
+            color: #00FFFF;
+        }
+
+        [data-theme="cyberpunk"] .agent-subtitle {
+            color: #9D00FF;
+            text-shadow: 0 0 15px #9D00FF;
+        }
+
+        /* Cyberpunk neon effects for different elements */
+        [data-theme="cyberpunk"] .user-message .message-content {
+            border-left-color: #FF00FF;
+            color: #FF00FF;
+            text-shadow: 0 0 8px #FF00FF;
+        }
+
+        [data-theme="cyberpunk"] .agent-message .message-content {
+            border-left-color: #00FFFF;
+            color: #00FFFF;
+            text-shadow: 0 0 8px #00FFFF;
+        }
+
+        [data-theme="cyberpunk"] .tool-message .message-content {
+            border-left-color: #39FF14;
+            color: #39FF14;
+            text-shadow: 0 0 8px #39FF14;
+        }
+
+        [data-theme="cyberpunk"] .error-message .message-content {
+            border-left-color: #FF003C;
+            color: #FF003C;
+            text-shadow: 0 0 8px #FF003C;
+        }
+
+        [data-theme="cyberpunk"] .send-button {
+            background: linear-gradient(135deg, #00FFFF, #FF00FF);
+            box-shadow: 0 0 20px #00FFFF;
+        }
+
+        [data-theme="cyberpunk"] .send-button:hover {
+            box-shadow: 0 0 30px #00FFFF, 0 0 40px #FF00FF;
+        }
+
+        [data-theme="cyberpunk"] .provider-card.active {
+            border-color: #FFD300;
+            color: #FFD300;
+            text-shadow: 0 0 10px #FFD300;
+        }
+
+        [data-theme="cyberpunk"] .provider-icon {
+            background: linear-gradient(135deg, #39FF14, #FFD300);
+            box-shadow: 0 0 15px #39FF14;
+        }
+
+        [data-theme="cyberpunk"] .thinking-dot {
+            background: #9D00FF;
+            box-shadow: 0 0 10px #9D00FF;
+        }
+        
+        .agent-container {
+            background: linear-gradient(135deg, var(--darker-bg) 80%, var(--grey-bg) 100%);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            max-width: 1200px;
+            margin: 2rem auto;
+            overflow: hidden;
+            border: 1.5px solid var(--light-grey);
+        }
+
+        /* Glassmorphism container effects */
+        [data-theme="glassmorphism"] .agent-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="glassmorphism"] .config-section,
+        [data-theme="glassmorphism"] .chat-area,
+        [data-theme="glassmorphism"] .input-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        [data-theme="glassmorphism"] .provider-card,
+        [data-theme="glassmorphism"] .message-content,
+        [data-theme="glassmorphism"] .example-prompt {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .agent-header {
+            background: linear-gradient(135deg, var(--darker-bg) 60%, var(--grey-bg) 100%);
+            color: var(--primary-color);
+            padding: 2.5rem 2rem 2rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid var(--light-grey);
+            box-shadow: 0 2px 24px 0 rgba(15, 23, 42, 0.6);
+        }
+        
+        .agent-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin: 0;
+            text-shadow: 0 2px 12px rgba(15, 23, 42, 0.8), 0 1px 0 var(--secondary-color);
+            letter-spacing: 0.04em;
+        }
+        
+        .agent-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            margin-top: 0.7rem;
+            text-shadow: 0 1px 8px rgba(15, 23, 42, 0.6);
+        }
+        
+        .config-section {
+            background: var(--grey-bg);
+            border-bottom: 1.5px solid var(--light-grey);
+            padding: 1.5rem;
+        }
+        
+        .provider-card {
+            background: var(--darker-bg);
+            border: 2px solid var(--light-grey);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-primary);
+        }
+        .provider-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 4px 16px rgba(34, 211, 238, 0.3);
+        }
+        .provider-card.active {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--darker-bg) 80%, var(--grey-bg) 100%);
+            color: var(--primary-color);
+        }
+        .provider-icon {
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            color: var(--dark-bg);
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.6);
+        }
+        
+        .chat-area {
+            min-height: 500px;
+            max-height: 600px;
+            overflow-y: auto;
+            background: var(--darker-bg);
+            padding: 1.5rem;
+            border-top: 1.5px solid var(--light-grey);
+            border-bottom: 1.5px solid var(--light-grey);
+        }
+        
+        .message {
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-bg);
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.6);
+        }
+        .user-avatar {
+            background: linear-gradient(135deg, var(--grey-bg), var(--light-grey));
+            color: var(--primary-color);
+        }
+        .agent-avatar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-bg);
+        }
+        .tool-avatar {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: var(--dark-bg);
+        }
+        .error-avatar {
+            background: linear-gradient(135deg, var(--secondary-color), #EF4444);
+            color: var(--text-primary);
+        }
+        
+        .message-content {
+            background: var(--grey-bg);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            border-left: 4px solid var(--light-grey);
+            color: var(--text-primary);
+        }
+        .user-message .message-content {
+            background: linear-gradient(135deg, var(--darker-bg) 80%, var(--grey-bg) 100%);
+            border-left-color: var(--primary-color);
+            color: var(--text-primary);
+        }
+        .agent-message .message-content {
+            background: linear-gradient(135deg, var(--grey-bg) 80%, var(--darker-bg) 100%);
+            border-left-color: var(--secondary-color);
+            color: var(--text-primary);
+        }
+        .tool-message .message-content {
+            background: linear-gradient(135deg, var(--grey-bg) 80%, var(--light-grey) 100%);
+            border-left-color: var(--primary-color);
+            color: var(--text-primary);
+        }
+        .error-message .message-content {
+            background: linear-gradient(135deg, #2D0F0F 80%, var(--darker-bg) 100%);
+            border-left-color: var(--secondary-color);
+            color: var(--secondary-color);
+        }
+        
+        .thinking-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            font-style: italic;
+            margin: 1rem 0;
+        }
+        
+        .thinking-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .thinking-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .thinking-dot:nth-child(2) { animation-delay: 0.5s; }
+        .thinking-dot:nth-child(3) { animation-delay: 1s; }
+        
+        .thinking-dot:nth-child(2) { animation-delay: 0.5s; }
+        .thinking-dot:nth-child(3) { animation-delay: 1s; }
+        
+        .input-section {
+            background: var(--grey-bg);
+            border-top: 1.5px solid var(--light-grey);
+            padding: 1.5rem;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-end;
+        }
+        
+        .message-input {
+            flex: 1;
+            border: 2px solid var(--light-grey);
+            background: var(--darker-bg);
+            color: var(--text-primary);
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: var(--transition);
+            resize: vertical;
+            min-height: 50px;
+            font-family: 'Inter', sans-serif;
+        }
+        .message-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.2);
+        }
+        
+        .send-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.6);
+        }
+        .send-button:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 4px 16px rgba(34, 211, 238, 0.3);
+        }
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(34, 211, 238, 0.2);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .tool-calls {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--darker-bg);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+        }
+        .tool-call {
+            background: var(--grey-bg);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--primary-color);
+            color: var(--text-primary);
+        }
+        .tool-call:last-child {
+            margin-bottom: 0;
+        }
+        .tool-name {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        .tool-params {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-family: 'Courier New', monospace;
+            background: var(--darker-bg);
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        .tool-result {
+            font-size: 0.9rem;
+            background: var(--grey-bg);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            padding: 0.5rem;
+            border-radius: 4px;
+            color: var(--text-primary);
+        }
+        
+        .welcome-screen {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+        }
+        .welcome-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .example-prompts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .example-prompt {
+            background: var(--grey-bg);
+            border: 2px solid rgba(34, 211, 238, 0.2);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+            color: var(--text-primary);
+        }
+        .example-prompt:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 4px 16px rgba(34, 211, 238, 0.3);
+        }
+        
+        .code-block {
+            background: var(--darker-bg);
+            color: var(--text-primary);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            border: 1.5px solid rgba(34, 211, 238, 0.2);
+        }
+        
+        /* Form Controls */
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            background: var(--darker-bg);
+            border: 2px solid var(--light-grey);
+            color: var(--text-primary);
+            border-radius: var(--border-radius);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background: var(--darker-bg);
+            border-color: var(--primary-color);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.2);
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+        
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--grey-bg);
+            border: 2px solid var(--light-grey);
+            border-radius: 2rem;
+            padding: 0.5rem;
+            transition: var(--transition);
+            flex-wrap: wrap;
+        }
+        
+        .theme-switch:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        .theme-option.active {
+            background: var(--primary-color);
+            color: var(--dark-bg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .theme-option i {
+            font-size: 0.9rem;
+        }
+
+        /* Responsive theme toggle */
+        @media (max-width: 768px) {
+            .theme-toggle {
+                position: relative;
+                top: 1rem;
+                right: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .theme-switch {
+                justify-content: center;
+            }
+            
+            .theme-option span {
+                display: none;
+            }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .agent-container {
+                margin: 1rem;
+                border-radius: 0;
+            }
+            .agent-title {
+                font-size: 2rem;
+            }
+            .example-prompts {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Theme Toggle -->
+        <div class="theme-toggle">
+            <div class="theme-switch">
+                <div class="theme-option" data-theme="light">
+                    <i class="bi bi-sun-fill"></i>
+                    <span>Light</span>
+                </div>
+                <div class="theme-option active" data-theme="dark">
+                    <i class="bi bi-moon-fill"></i>
+                    <span>Dark</span>
+                </div>
+                <div class="theme-option" data-theme="cyberpunk">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    <span>Cyberpunk</span>
+                </div>
+                <div class="theme-option" data-theme="glassmorphism">
+                    <i class="bi bi-gem"></i>
+                    <span>Glass</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="agent-container">
+            <!-- Header -->
+            <div class="agent-header">
+                <h1 class="agent-title">
+                    <i class="bi bi-robot me-3"></i>
+                    LLM Agent POC
+                </h1>
+                <p class="agent-subtitle">Browser-Based Multi-Tool Reasoning with Graph Intelligence</p>
+            </div>
+            
+            <!-- Configuration Section -->
+            <div class="config-section">
+                <div class="row">
+                    <!-- Provider Selection -->
+                    <div class="col-md-6">
+                        <h5 class="mb-3">
+                            <i class="bi bi-gear-fill me-2"></i>
+                            LLM Provider
+                        </h5>
+                        <div id="providerCards">
+                            <div class="provider-card active" data-provider="aipipe">
+                                <div class="provider-icon">🔗</div>
+                                <div>
+                                    <h6 class="mb-1">AI Pipe</h6>
+                                    <small class="text-muted">Free OpenAI/OpenRouter proxy</small>
+                                </div>
+                            </div>
+                            <div class="provider-card" data-provider="openai">
+                                <div class="provider-icon">🤖</div>
+                                <div>
+                                    <h6 class="mb-1">OpenAI</h6>
+                                    <small class="text-muted">Direct API access</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- API Configuration -->
+                    <div class="col-md-6">
+                        <h5 class="mb-3">
+                            <i class="bi bi-key-fill me-2"></i>
+                            Configuration
+                        </h5>
+                        <div class="mb-3">
+                            <label for="apiKey" class="form-label">API Key (Optional for AI Pipe)</label>
+                            <input type="password" class="form-control" id="apiKey" placeholder="Enter your API key">
+                        </div>
+                        <div class="mb-3">
+                            <label for="model" class="form-label">Model</label>
+                            <select class="form-select" id="model">
+                                <option value="gpt-4o-mini">GPT-4o Mini</option>
+                                <option value="gpt-4">GPT-4</option>
+                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Area -->
+            <div class="chat-area" id="chatArea">
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-icon">
+                        <i class="bi bi-cpu-fill"></i>
+                    </div>
+                    <h3>Welcome to LLM Agent POC</h3>
+                    <p>Experience next-generation multi-tool reasoning. I can search the web, execute code, and process complex workflows.</p>
+                    
+                    <div class="example-prompts">
+                        <div class="example-prompt" data-prompt="Search for the latest AI developments and summarize the key trends">
+                            <h6><i class="bi bi-search me-2"></i>Web Search</h6>
+                            <p class="mb-0">Search for the latest AI developments and summarize the key trends</p>
+                        </div>
+                        <div class="example-prompt" data-prompt="Create a simple calculator function and demonstrate it with examples">
+                            <h6><i class="bi bi-code-slash me-2"></i>Code Execution</h6>
+                            <p class="mb-0">Create a simple calculator function and demonstrate it with examples</p>
+                        </div>
+                        <div class="example-prompt" data-prompt="Use AI workflows to analyze market sentiment for renewable energy stocks">
+                            <h6><i class="bi bi-lightning-charge me-2"></i>AI Workflow</h6>
+                            <p class="mb-0">Use AI workflows to analyze market sentiment for renewable energy stocks</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="messages"></div>
+            </div>
+            
+            <!-- Input Section -->
+            <div class="input-section">
+                <div class="input-wrapper">
+                    <textarea 
+                        class="message-input" 
+                        id="userInput" 
+                        placeholder="Ask me anything... I can search, code, and reason through complex problems!"
+                        rows="3"
+                    ></textarea>
+                    <button class="send-button" id="sendButton">
+                        <i class="bi bi-send-fill"></i>
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Theme Switching Script -->
+    <script>
+        // Theme switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeOptions = document.querySelectorAll('.theme-option');
+            const body = document.body;
+            
+            // Load saved theme or default to dark
+            const savedTheme = localStorage.getItem('selectedTheme') || 'dark';
+            applyTheme(savedTheme);
+            
+            // Add click listeners to theme options
+            themeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const theme = this.getAttribute('data-theme');
+                    applyTheme(theme);
+                    localStorage.setItem('selectedTheme', theme);
+                });
+            });
+            
+            function applyTheme(theme) {
+                // Remove all theme classes
+                body.removeAttribute('data-theme');
+                
+                // Apply new theme
+                if (theme === 'light') {
+                    body.setAttribute('data-theme', 'light');
+                }
+                
+                // Update active state
+                themeOptions.forEach(option => {
+                    option.classList.remove('active');
+                    if (option.getAttribute('data-theme') === theme) {
+                        option.classList.add('active');
+                    }
+                });
+            }
+        });
+    </script>
+    
+    <script type="module" src="agent.js"></script>
+</body>
+</html>

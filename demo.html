@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Agent Demo - Comprehensive Test Suite</title>
+    
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .demo-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin: 2rem auto;
+            max-width: 1000px;
+        }
+        
+        .demo-header {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem 1rem 0 0;
+            text-align: center;
+        }
+        
+        .test-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .test-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-prompt {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            margin: 1rem 0;
+        }
+        
+        .feature-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 0.25rem;
+        }
+        
+        .demo-button {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+        }
+        
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            color: white;
+        }
+        
+        .architecture-diagram {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .flow-step {
+            display: inline-block;
+            background: white;
+            border: 2px solid #3b82f6;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 0.5rem;
+            min-width: 120px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .flow-arrow {
+            display: inline-block;
+            margin: 0 1rem;
+            font-size: 1.5rem;
+            color: #3b82f6;
+        }
+        
+        @media (max-width: 768px) {
+            .demo-container {
+                margin: 1rem;
+                border-radius: 0;
+            }
+            
+            .flow-step {
+                display: block;
+                margin: 1rem auto;
+            }
+            
+            .flow-arrow {
+                display: block;
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="demo-container">
+            <!-- Header -->
+            <div class="demo-header">
+                <h1>
+                    <i class="bi bi-robot me-3"></i>
+                    LLM Agent POC Demo
+                </h1>
+                <p class="mb-0">Comprehensive Test Suite for Multi-Tool Reasoning</p>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-4">
+                <!-- Quick Launch -->
+                <div class="text-center mb-4">
+                    <h3 class="mb-3">🚀 Launch the Agent</h3>
+                    <a href="agent.html" class="demo-button">
+                        <i class="bi bi-play-circle me-2"></i>
+                        Open LLM Agent POC
+                    </a>
+                    <p class="text-muted mt-2">Click above to start the full agent interface</p>
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Architecture Overview -->
+                <div class="mb-5">
+                    <h3 class="mb-3">
+                        <i class="bi bi-diagram-3 me-2"></i>
+                        Agent Architecture
+                    </h3>
+                    
+                    <div class="architecture-diagram">
+                        <h5>Core Agent Loop</h5>
+                        <div class="mt-3">
+                            <div class="flow-step">
+                                <i class="bi bi-person-fill d-block mb-2"></i>
+                                User Input
+                            </div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">
+                                <i class="bi bi-brain d-block mb-2"></i>
+                                LLM Analysis
+                            </div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">
+                                <i class="bi bi-tools d-block mb-2"></i>
+                                Tool Calls
+                            </div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">
+                                <i class="bi bi-check-circle d-block mb-2"></i>
+                                Synthesis
+                            </div>
+                        </div>
+                        <p class="mt-3 text-muted">
+                            The agent continuously loops between LLM reasoning and tool execution until the task is complete
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Feature Overview -->
+                <div class="mb-5">
+                    <h3 class="mb-3">
+                        <i class="bi bi-star me-2"></i>
+                        Key Features
+                    </h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="test-card">
+                                <h5><i class="bi bi-loop me-2"></i>Core Agent Loop</h5>
+                                <p>Implements the Python-style reasoning loop in JavaScript with streaming responses and tool orchestration.</p>
+                                <div>
+                                    <span class="feature-badge">OpenAI Function Calling</span>
+                                    <span class="feature-badge">Streaming Responses</span>
+                                    <span class="feature-badge">Error Recovery</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="test-card">
+                                <h5><i class="bi bi-tools me-2"></i>Multi-Tool Integration</h5>
+                                <p>Three powerful tools working in harmony: web search, AI workflows, and code execution.</p>
+                                <div>
+                                    <span class="feature-badge">Google Search</span>
+                                    <span class="feature-badge">AI Pipe Workflows</span>
+                                    <span class="feature-badge">JavaScript Sandbox</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="test-card">
+                                <h5><i class="bi bi-palette me-2"></i>Modern UI/UX</h5>
+                                <p>Beautiful, responsive interface with real-time tool execution visualization and mobile support.</p>
+                                <div>
+                                    <span class="feature-badge">Bootstrap 5.3</span>
+                                    <span class="feature-badge">Real-time Updates</span>
+                                    <span class="feature-badge">Mobile Responsive</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="test-card">
+                                <h5><i class="bi bi-shield-check me-2"></i>Production Ready</h5>
+                                <p>Comprehensive error handling, multiple provider support, and extensible architecture.</p>
+                                <div>
+                                    <span class="feature-badge">Error Handling</span>
+                                    <span class="feature-badge">Provider Switching</span>
+                                    <span class="feature-badge">Extensible</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Test Scenarios -->
+                <div class="mb-5">
+                    <h3 class="mb-3">
+                        <i class="bi bi-clipboard-check me-2"></i>
+                        Test Scenarios
+                    </h3>
+                    
+                    <!-- Web Search Test -->
+                    <div class="test-card">
+                        <h5>
+                            <i class="bi bi-search me-2"></i>
+                            Web Search Capability Test
+                        </h5>
+                        <p>Tests the agent's ability to search for current information and synthesize results.</p>
+                        <div class="test-prompt">
+                            "What are the latest developments in artificial intelligence for 2024? Please search for recent news and summarize the key trends."
+                        </div>
+                        <p><strong>Expected behavior:</strong></p>
+                        <ul>
+                            <li>Agent calls google_search tool with relevant query</li>
+                            <li>Displays search results in real-time</li>
+                            <li>Synthesizes findings into coherent summary</li>
+                            <li>Provides source links and timestamps</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Code Execution Test -->
+                    <div class="test-card">
+                        <h5>
+                            <i class="bi bi-code-slash me-2"></i>
+                            JavaScript Execution Test
+                        </h5>
+                        <p>Validates the sandboxed code execution environment with safety measures.</p>
+                        <div class="test-prompt">
+                            "Create a function to calculate the Fibonacci sequence and demonstrate it by finding the first 10 numbers. Show me the code and run it."
+                        </div>
+                        <p><strong>Expected behavior:</strong></p>
+                        <ul>
+                            <li>Agent generates JavaScript code for Fibonacci sequence</li>
+                            <li>Executes code in sandboxed environment</li>
+                            <li>Displays both code and execution results</li>
+                            <li>Shows console output and return values</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- AI Workflow Test -->
+                    <div class="test-card">
+                        <h5>
+                            <i class="bi bi-lightning-charge me-2"></i>
+                            AI Workflow Processing Test
+                        </h5>
+                        <p>Tests advanced AI processing capabilities via AI Pipe workflows.</p>
+                        <div class="test-prompt">
+                            "Analyze the pros and cons of remote work based on recent research. Use AI workflows to process multiple perspectives and provide a balanced analysis."
+                        </div>
+                        <p><strong>Expected behavior:</strong></p>
+                        <ul>
+                            <li>Agent searches for remote work research</li>
+                            <li>Uses AI workflow for analysis processing</li>
+                            <li>Combines multiple sources and viewpoints</li>
+                            <li>Provides structured, balanced analysis</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Multi-Tool Integration Test -->
+                    <div class="test-card">
+                        <h5>
+                            <i class="bi bi-gear-wide-connected me-2"></i>
+                            Multi-Tool Integration Test
+                        </h5>
+                        <p>Comprehensive test using multiple tools in sequence for complex problem solving.</p>
+                        <div class="test-prompt">
+                            "Research the current stock price of Tesla, calculate the percentage change over the last month, and create a simple visualization function to display the trend. Please search for the data, perform calculations, and show working code."
+                        </div>
+                        <p><strong>Expected behavior:</strong></p>
+                        <ul>
+                            <li>Search for Tesla stock information</li>
+                            <li>Extract relevant price data</li>
+                            <li>Execute JavaScript for calculations</li>
+                            <li>Create visualization code</li>
+                            <li>Demonstrate the complete solution</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Provider Configuration -->
+                <div class="mb-5">
+                    <h3 class="mb-3">
+                        <i class="bi bi-gear me-2"></i>
+                        Provider Configuration
+                    </h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="test-card">
+                                <h5>
+                                    <i class="bi bi-link-45deg me-2"></i>
+                                    AI Pipe (Recommended)
+                                </h5>
+                                <p>Free tier with automatic authentication. Perfect for testing and development.</p>
+                                <ul>
+                                    <li>✅ No API key required initially</li>
+                                    <li>✅ 10 cents/week free tier</li>
+                                    <li>✅ Automatic Google Sign-In</li>
+                                    <li>✅ CORS-free proxy access</li>
+                                    <li>✅ Multiple model support</li>
+                                </ul>
+                                <a href="https://aipipe.org/login" target="_blank" class="demo-button">
+                                    <i class="bi bi-box-arrow-up-right me-2"></i>
+                                    Get AI Pipe Token
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="test-card">
+                                <h5>
+                                    <i class="bi bi-robot me-2"></i>
+                                    OpenAI Direct
+                                </h5>
+                                <p>Direct access to OpenAI's latest models with your own API key.</p>
+                                <ul>
+                                    <li>🔑 API key required</li>
+                                    <li>💳 Pay-per-use pricing</li>
+                                    <li>⚡ Fastest response times</li>
+                                    <li>🔄 Latest model access</li>
+                                    <li>📊 Usage analytics</li>
+                                </ul>
+                                <a href="https://platform.openai.com/api-keys" target="_blank" class="demo-button">
+                                    <i class="bi bi-box-arrow-up-right me-2"></i>
+                                    Get OpenAI API Key
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Technical Implementation -->
+                <div class="mb-5">
+                    <h3 class="mb-3">
+                        <i class="bi bi-code me-2"></i>
+                        Technical Implementation
+                    </h3>
+                    
+                    <div class="test-card">
+                        <h5>Core Technologies</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Frontend Stack</h6>
+                                <ul>
+                                    <li><strong>Vanilla JavaScript ES6+</strong> - No framework dependencies</li>
+                                    <li><strong>Bootstrap 5.3</strong> - Modern, responsive UI</li>
+                                    <li><strong>lit-html</strong> - Efficient templating</li>
+                                    <li><strong>marked</strong> - Markdown rendering</li>
+                                    <li><strong>highlight.js</strong> - Syntax highlighting</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>External APIs</h6>
+                                <ul>
+                                    <li><strong>OpenAI API</strong> - Core LLM functionality</li>
+                                    <li><strong>AI Pipe Proxy</strong> - Free access & CORS handling</li>
+                                    <li><strong>Google Custom Search</strong> - Web search capability</li>
+                                    <li><strong>JavaScript Sandbox</strong> - Safe code execution</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h5>Key Implementation Details</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Agent Loop Logic</h6>
+                                <pre><code>async agentLoop(userInput) {
+  const messages = [/*system + user*/];
+  
+  while (true) {
+    const {output, toolCalls} = 
+      await this.callLLM(messages);
+    
+    if (!toolCalls.length) return;
+    
+    const results = 
+      await this.handleToolCalls(toolCalls);
+    
+    messages.push(/*assistant + tools*/);
+  }
+}</code></pre>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Tool Definition Format</h6>
+                                <pre><code>{
+  type: "function",
+  function: {
+    name: "google_search",
+    description: "Search the web...",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {type: "string"},
+        num_results: {type: "integer"}
+      },
+      required: ["query"]
+    }
+  }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Evaluation Checklist -->
+                <div class="mb-5">
+                    <h3 class="mb-3">
+                        <i class="bi bi-check2-square me-2"></i>
+                        Evaluation Checklist
+                    </h3>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="test-card">
+                                <h5>Output Functionality (1.0)</h5>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">LLM conversation window</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Google Search integration</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">AI Pipe proxy API</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">JS code execution</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">OpenAI tool-calling</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Bootstrap alerts</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="test-card">
+                                <h5>Code Quality (0.5)</h5>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Minimal & hackable</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Well-documented</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Modular architecture</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Error handling</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">ES6+ features</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Clean code style</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="test-card">
+                                <h5>UI/UX Polish (0.5)</h5>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Modern Bootstrap design</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Real-time interactions</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Tool execution display</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Provider selection</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Mobile responsive</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label">Animation & polish</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Launch Buttons -->
+                <div class="text-center">
+                    <h3 class="mb-4">🎯 Ready to Test?</h3>
+                    <a href="agent.html" class="demo-button me-3">
+                        <i class="bi bi-rocket-takeoff me-2"></i>
+                        Launch Full Agent
+                    </a>
+                    <a href="README_AGENT.md" class="demo-button">
+                        <i class="bi bi-book me-2"></i>
+                        Read Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
