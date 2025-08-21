@@ -105,12 +105,6 @@ Agent: "Based on my research, Tesla (TSLA) is currently at $245.67, representing
 - ✅ Bootstrap alerts for error handling
 - ✅ Minimal, extensible codebase
 
-### **Evaluation Criteria (2.0/2.0 Marks)**
-| Criteria | Marks | Status |
-|----------|--------|---------|
-| **Output functionality** | 1.0/1.0 | ✅ All tools working, conversation flow implemented |
-| **Code quality & clarity** | 0.5/0.5 | ✅ Clean, documented, modular architecture |
-| **UI/UX polish & extras** | 0.5/0.5 | ✅ Modern design, themes, responsive, real-time updates |
 
 ## ✨ Key Features
 
@@ -155,32 +149,16 @@ The application is fully responsive and optimized for all screen sizes:
 ## 🎨 Themes
 
 ### 🌟 Light Theme (`agent-light.html`)
-- **Background**: Clean whites and light grays
-- **Primary**: Teal (#14B8A6) 
-- **Secondary**: Coral (#FB7185)
-- **Typography**: Inter font family
-- **Style**: Minimalist, professional
+
 
 ### 🌙 Dark Theme (`agent-dark.html`)  
-- **Background**: Navy black (#0F172A)
-- **Primary**: Neon cyan (#22D3EE)
-- **Secondary**: Neon pink (#F43F5E) 
-- **Typography**: Inter font family
-- **Style**: Modern, high-contrast
+
 
 ### 🔮 Cyberpunk Theme (`agent-cyberpunk.html`)
-- **Background**: Pure black (#000000)
-- **Colors**: Multi-neon (cyan, magenta, green, gold)
-- **Typography**: Orbitron + Inter fonts
-- **Effects**: Text shadows, neon glows
-- **Style**: Futuristic, high-tech
+
 
 ### 💎 Glass Theme (`agent-glass.html`)
-- **Background**: Slate navy with blur effects
-- **Glass Panels**: `rgba(255,255,255,0.08)` with `backdrop-filter: blur(20px)`
-- **Primary**: Sky blue (#38BDF8)
-- **Secondary**: Pink (#F472B6)
-- **Style**: Modern glassmorphism
+
 
 ## ⏸️ Pause/Cancel Feature
 
@@ -608,4 +586,5 @@ A: Clear browser cache and ensure you're using a modern mobile browser.
 [🌟 Star on GitHub](#) | [🐛 Report Bug](#) | [💡 Request Feature](#) | [📖 Documentation](#)
 
 </div>
+
 
