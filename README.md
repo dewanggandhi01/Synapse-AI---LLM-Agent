@@ -1,4 +1,4 @@
-# Synapse AI - Multi-Theme LLM Agent Platform
+# Synapse AI - LLM Agent Platform
 
 <div align="center">
 
@@ -608,3 +608,4 @@ A: Clear browser cache and ensure you're using a modern mobile browser.
 [🌟 Star on GitHub](#) | [🐛 Report Bug](#) | [💡 Request Feature](#) | [📖 Documentation](#)
 
 </div>
+
