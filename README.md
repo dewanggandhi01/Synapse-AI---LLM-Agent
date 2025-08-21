@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Synapse AI Logo](logo.png)
+<img src="logo.png" alt="Synapse AI Logo" width="200" height="200">
 
 **Browser-Based Multi-Tool Reasoning with Advanced Theme System**
 
